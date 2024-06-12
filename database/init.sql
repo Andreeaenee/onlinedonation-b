@@ -21,7 +21,13 @@ CREATE TABLE "user" (
     phone VARCHAR(20),
     logo_id VARCHAR(255),
     password VARCHAR(255),
-    status_id INTEGER REFERENCES status_name(id)
+    status_id INTEGER REFERENCES status_name(id),
+    name VARCHAR(255),
+    main_photo_id VARCHAR(255),
+    link VARCHAR(255),
+    document_id VARCHAR(255),
+    cif VARCHAR(255),
+    contract_id VARCHAR(255)
 );
 
 CREATE TABLE email_verification (
