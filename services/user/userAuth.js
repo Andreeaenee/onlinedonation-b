@@ -280,11 +280,10 @@ async function getGoogleUserInfo(access_token) {
 }
 
 function generateToken(user, result) {
-  console.log('user:', user, result);
   const payload = {
-    user_id: user.id || user.user_id,
+    user_id: result?.user_id || user.user_id,
     email: user.email,
-    user_type_id: result.user_type_id || user.user_type_id,
+    user_type_id: result?.user_type_id || user.user_type_id,
   };
   // Sign the token with a secret key
   const token = jwt.sign(payload, privateKey, {
