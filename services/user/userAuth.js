@@ -1,16 +1,11 @@
 const {
-  addUserQuery,
-  addVerificationEmailTokenQuery,
   getUserIdQuery,
-  getEmailQuery,
   updateUserStatusQuery,
   updateEmailVerificationQuery,
   checkUserQuery,
   logInQuery,
   completeRegistrationQuery,
-  addOngQuery,
 } = require('../../database/queries/userAuth');
-const { sendVerificationEmail } = require('../../utils/email');
 const { calculateTokenExpiration } = require('../../utils/user');
 const asyncHandler = require('express-async-handler');
 const { promisify } = require('util');
@@ -26,50 +21,6 @@ const jwt = require('jsonwebtoken');
 const privateKey = fs.readFileSync(
   path.join(__dirname, '../../utilsPasswords/private_key.pem')
 );
-
-// Add user
-const addUserDB = asyncHandler(async (req, res) => {
-  const { user_type_id, email, password } = req.body;
-  if (!user_type_id || !email || !password) {
-    res.status(400);
-    throw new Error('Please fill all fields');
-  }
-  const status_id = 1;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  try {
-    const checkUser = await poolQuery(checkUserQuery, [email]);
-    if (checkUser.rows.length) {
-      return res.status(400).json('User already exists');
-    }
-
-    const result = await poolQuery(addUserQuery, [
-      user_type_id,
-      email,
-      hashedPassword,
-      status_id,
-    ]);
-    if (!result || !result.rows || result.rows.length === 0) {
-      return res.status(500).json('Unexpected database result');
-    }
-
-    const { user_id } = result.rows[0];
-    const verificationToken = crypto.randomBytes(20).toString('hex');
-    const result2 = await poolQuery(addVerificationEmailTokenQuery, [
-      user_id,
-      verificationToken,
-    ]);
-    if (!result2 || !result2.rows || result2.rows.length === 0) {
-      return res.status(500).json('Unexpected database result');
-    }
-
-    sendVerificationEmail(email, verificationToken);
-
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
-  }
-});
 
 // Verify email
 const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
@@ -112,32 +63,18 @@ const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
     }
 
     if (isPasswordReset) {
-      return res.status(201).redirect(
-        `${process.env.REST_API_FE}/login/reset-password/email-verified`
-      );
+      return res
+        .status(201)
+        .redirect(
+          `${process.env.REST_API_FE}/login/reset-password/email-verified`
+        );
     } else {
-      return res.status(201).redirect(
-        `${process.env.REST_API_FE}/login/register/email-verified/${user_id}`
-      );
+      return res
+        .status(201)
+        .redirect(
+          `${process.env.REST_API_FE}/login/register/email-verified/${user_id}`
+        );
     }
-  } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
-  }
-});
-
-const getUserEmail = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    res.status(400);
-    throw new Error('User ID is required');
-  }
-  try {
-    const result = await poolQuery(getEmailQuery, [id]);
-    if (!result || !result.rows || result.rows.length === 0) {
-      return res.status(404).json('User not found');
-    }
-    res.status(200).json(result.rows[0]);
   } catch (error) {
     res.status(500);
     throw new Error(error.message);
@@ -185,7 +122,6 @@ const completeRegistration = asyncHandler(async (req, res) => {
   }
 });
 
-
 // Log in
 const logIn = asyncHandler(async (req, res) => {
   const { email, password } = req.query;
@@ -204,7 +140,9 @@ const logIn = asyncHandler(async (req, res) => {
       case 1:
         return res.status(400).json('Email not verified');
       case 2:
-        return res.status(400).json('Email verified but registration is not complete');
+        return res
+          .status(400)
+          .json('Email verified but registration is not complete');
       // case 3:
       //   return res
       //     .status(400)
@@ -284,10 +222,8 @@ function generateToken(user, result) {
 }
 
 module.exports = {
-  addUserDB,
   verifyEmail,
   logIn,
   getAccessTokenFromCode,
   completeRegistration,
-  getUserEmail,
 };
