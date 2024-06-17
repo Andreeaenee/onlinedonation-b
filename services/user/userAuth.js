@@ -173,18 +173,8 @@ const completeRegistration = asyncHandler(async (req, res) => {
     if (!result || !result.rowCount) {
       return res.status(500).json('Failed to complete registration process');
     }
-
-    const result2 = await poolQuery(addOngQuery, [
-      description,
-      user_id,
-    ]);
-
-    if (!result2 || !result2.rowCount) {
-      return res.status(500).json('Failed to update description');
-    }
-
-    const result3 = await poolQuery(updateUserStatusQuery, [user_id, 3]);
-    if (!result3 || !result3.rowCount) {
+    const result4 = await poolQuery(updateUserStatusQuery, [user_id, 3]);
+    if (!result4 || !result4.rowCount) {
       return res.status(500).json('Failed to update user status');
     }
 

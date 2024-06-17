@@ -29,6 +29,7 @@ const addDonationDB = asyncHandler(async (req, res) => {
         transport_provided,
         phone,
         pick_up_point,
+        restaurant_id,
       } = req.body;
 
       if (
@@ -55,6 +56,7 @@ const addDonationDB = asyncHandler(async (req, res) => {
           transport_provided,
           phone,
           pick_up_point,
+          restaurant_id,
         ]);
 
         if (!result || !result.rows || result.rows.length === 0) {

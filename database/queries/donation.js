@@ -1,6 +1,6 @@
-const addDonationQuery = `INSERT INTO Donation (name, description, quantity, image_id,  start_date, end_date, transport_provided, phone, pick_up_point)
+const addDonationQuery = `INSERT INTO Donation (name, description, quantity, image_id,  start_date, end_date, transport_provided, phone, pick_up_point, restaurant_id)
     VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING donation_id`;
 
 const getDonationsQuery = `SELECT * FROM donation ORDER BY donation_id`;

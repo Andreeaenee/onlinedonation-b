@@ -27,7 +27,8 @@ CREATE TABLE "user" (
     link VARCHAR(255),
     document_id VARCHAR(255),
     cif VARCHAR(255),
-    contract_id VARCHAR(255)
+    contract_id VARCHAR(255),
+    description VARCHAR(255)
 );
 
 CREATE TABLE email_verification (
@@ -47,19 +48,6 @@ CREATE TABLE users_have_socials (
 );
 
 
-CREATE TABLE Ong (
-    ong_id SERIAL PRIMARY KEY,
-    description TEXT,
-    user_id INTEGER REFERENCES "user"(user_id)
-);
-
-
-CREATE TABLE Restaurants (
-    restaurant_id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES "user"(user_id)
-);
-
-
 CREATE TABLE Donation (
     donation_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -71,11 +59,10 @@ CREATE TABLE Donation (
     transport_provided BOOLEAN,
     phone VARCHAR(20),
     pick_up_point VARCHAR(255),
-    restaurant_id INTEGER REFERENCES Restaurants(restaurant_id) ON DELETE CASCADE,
-    ong_id INTEGER,
+    restaurant_id INTEGER REFERENCES user(user_id) ON DELETE CASCADE,
+    ong_id INTEGER REFERENCES user(user_id) ON DELETE SET NULL,
     delivery_address VARCHAR(255),
-    post_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ong_id) REFERENCES Ong(ong_id) ON DELETE SET NULL
+    post_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Donation_Driver (

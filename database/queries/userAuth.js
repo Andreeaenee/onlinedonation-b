@@ -10,10 +10,10 @@ const logInQuery = `SELECT * FROM "user" WHERE email = $1;`;
 const changePasswordQuery = `UPDATE "user" SET password = $1 WHERE user_id = $2;`;
 const updateEmailVerificationTokenQuery = `UPDATE "email_verification" SET confirmation_token = $2, created_at = $3 WHERE user_id = $1;`;
 
-const completeRegistrationQuery = `UPDATE "user" SET name = $1, address = $2, phone = $3, link= $4, logo_id = $5, main_photo_id = $6, document_id = $7, cif = $8, contract_id = $9 WHERE user_id = $10;`;
-const addOngQuery = `INSERT INTO "ong" (description, user_id) VALUES ($1, $2) returning ong_id;`;
-
+const completeRegistrationQuery = `UPDATE "user" SET name = $1, address = $2, phone = $3, link= $4, logo_id = $5, main_photo_id = $6, document_id = $7, cif = $8, contract_id = $9, description = $10 WHERE user_id = $11;`;
 const getEmailQuery = `SELECT email FROM "user" WHERE user_id = $1;`;
+
+const getUserTypeQuery = `SELECT user_type_id FROM "user" WHERE user_id = $1;`;
 module.exports = {
   addUserQuery,
   addVerificationEmailTokenQuery,
@@ -25,6 +25,6 @@ module.exports = {
   getUserIdQuery,
   updateEmailVerificationTokenQuery,
   completeRegistrationQuery,
-  addOngQuery,
   getEmailQuery,
+  getUserTypeQuery,
 };
