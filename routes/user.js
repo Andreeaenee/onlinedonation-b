@@ -6,23 +6,27 @@ const {
   getAccessTokenFromCode,
   completeRegistration,
 } = require('../services/user/userAuth');
-const { addUserDB, getUserEmail } = require('../services/user/user');
+const { addUserDB, getUserEmail, getUsers } = require('../services/user/user');
 const {
   forgotPassword,
   resetPassword,
 } = require('../services/user/forgetPass');
 const { uploadDocumentsMiddleware } = require('../middleware/uploads');
+const authMiddleware = require('../middleware/auth');
 
-router.post('/user/credentials', asyncHandler(addUserDB));
-router.get('/user/login', asyncHandler(logIn));
+router.post('/users/credentials', asyncHandler(addUserDB));
+router.post('/users/forgot-password', asyncHandler(forgotPassword));
+router.post('/users/reset-password', asyncHandler(resetPassword));
 router.post(
-  '/user/register',
+  '/users/register',
   uploadDocumentsMiddleware,
   asyncHandler(completeRegistration)
 );
-router.post('/user/forgot-password', asyncHandler(forgotPassword));
-router.post('/user/reset-password', asyncHandler(resetPassword));
-router.get('/user/email/:id', asyncHandler(getUserEmail));
 router.post('/login', asyncHandler(getAccessTokenFromCode));
+
+
+router.get('/users', authMiddleware, asyncHandler(getUsers))
+router.get('/users/login', asyncHandler(logIn));
+router.get('/users/email/:id', asyncHandler(getUserEmail));
 
 module.exports = router;

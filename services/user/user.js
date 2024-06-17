@@ -11,6 +11,7 @@ const {
   checkUserQuery,
   addVerificationEmailTokenQuery,
   getEmailQuery,
+  getAllUsersQuery,
 } = require('../../database/queries/userAuth');
 
 // Add user
@@ -57,6 +58,20 @@ const addUserDB = asyncHandler(async (req, res) => {
   }
 });
 
+// Get all users
+const getUsers = asyncHandler(async (req, res) => {
+  try {
+    const result = await poolQuery(getAllUsersQuery);
+    if (!result || !result.rows || result.rows.length === 0) {
+      return res.status(404).json('Users not found');
+    }
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 const getUserEmail = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -75,7 +90,9 @@ const getUserEmail = asyncHandler(async (req, res) => {
   }
 });
 
+
 module.exports = {
   addUserDB,
   getUserEmail,
+  getUsers,
 };

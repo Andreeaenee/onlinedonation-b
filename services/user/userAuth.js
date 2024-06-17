@@ -11,13 +11,11 @@ const asyncHandler = require('express-async-handler');
 const { promisify } = require('util');
 const pool = require('../../config/db');
 const poolQuery = promisify(pool.query).bind(pool);
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
 const axios = require('axios');
-const saltRounds = 11;
 const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const privateKey = fs.readFileSync(
   path.join(__dirname, '../../utilsPasswords/private_key.pem')
 );
