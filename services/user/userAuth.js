@@ -3,7 +3,6 @@ const {
   updateUserStatusQuery,
   updateEmailVerificationQuery,
   checkUserQuery,
-  logInQuery,
   completeRegistrationQuery,
 } = require('../../database/queries/userAuth');
 const { calculateTokenExpiration } = require('../../utils/user');
@@ -102,6 +101,7 @@ const completeRegistration = asyncHandler(async (req, res) => {
       document_id,
       cif,
       contract_id,
+      description,
       user_id,
     ]);
 
@@ -128,7 +128,7 @@ const logIn = asyncHandler(async (req, res) => {
     throw new Error('Please fill all fields');
   }
   try {
-    const result = await poolQuery(logInQuery, [email]);
+    const result = await poolQuery(checkUserQuery, [email]);
     if (!result || !result.rows || result.rows.length === 0) {
       return res.status(404).json('User not found');
     }
@@ -175,7 +175,7 @@ const getAccessTokenFromCode = asyncHandler(async (req, res) => {
     },
   });
   const userData = await getGoogleUserInfo(data.access_token);
-  const result = await poolQuery(logInQuery, [userData.email]);
+  const result = await poolQuery(checkUserQuery, [userData.email]);
   if (!result || !result.rows || result.rows.length === 0) {
     return res.status(404).json('User not found');
   }

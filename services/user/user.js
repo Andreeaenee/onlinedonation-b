@@ -12,6 +12,7 @@ const {
   addVerificationEmailTokenQuery,
   getEmailQuery,
   getAllUsersQuery,
+  getAllUsersByStatusQuery,
 } = require('../../database/queries/userAuth');
 
 // Add user
@@ -60,12 +61,30 @@ const addUserDB = asyncHandler(async (req, res) => {
 
 // Get all users
 const getUsers = asyncHandler(async (req, res) => {
+  const { filter, filterId } = req.query;
+
   try {
-    const result = await poolQuery(getAllUsersQuery);
-    if (!result || !result.rows || result.rows.length === 0) {
-      return res.status(404).json('Users not found');
+    switch (filter) {
+      case 'status_id':
+        if (!filterId) {
+          res.status(400);
+          throw new Error('Filter ID is required');
+        }
+        const result1 = await poolQuery(getAllUsersByStatusQuery, [filterId]);
+        if (!result1 || !result1.rows || result1.rows.length === 0) {
+          return res.status(404).json('Users requests not found');
+        }
+        res.status(200).json(result1.rows);
+        break;
+      default:
+        const result = await poolQuery(getAllUsersQuery);
+        if (!result || !result.rows || result.rows.length === 0) {
+          return res.status(404).json('Users not found');
+        }
+        res.status(200).json(result.rows);
+        break;
     }
-    res.status(200).json(result.rows);
+    
   } catch (error) {
     res.status(500);
     throw new Error(error.message);
@@ -89,7 +108,6 @@ const getUserEmail = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
-
 
 module.exports = {
   addUserDB,

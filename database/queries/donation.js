@@ -3,7 +3,11 @@ const addDonationQuery = `INSERT INTO Donation (name, description, quantity, ima
     ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING donation_id`;
 
-const getDonationsQuery = `SELECT * FROM donation ORDER BY donation_id`;
+const getDonationsQuery = `SELECT donation.*, "user".name AS restaurant_name
+FROM donation
+JOIN "user" ON "user".user_id = donation.restaurant_id
+ORDER BY donation.donation_id;
+`;
 
 const getDonationByIdQuery = `SELECT * FROM donation WHERE donation_id = $1`;
 
