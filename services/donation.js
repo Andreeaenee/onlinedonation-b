@@ -5,6 +5,9 @@ const {
   deleteDonationByIdQuery,
   updateDonationByIdQuery,
   updateDonationOnlyOngIdQuery,
+  updateStatusDonationQuery,
+  getDonationsByOngIdQuery,
+  getDonationByRestaurantIdQuery,
 } = require('../database/queries/donation');
 const { uploadMiddleware } = require('../middleware/uploads');
 const { handleFileSizeLimit } = require('../middleware/uploads');
@@ -43,6 +46,7 @@ const addDonationDB = asyncHandler(async (req, res) => {
         res.status(400).json({ message: 'Please fill all fields' });
         return;
       }
+      let status_id = 2;
 
       const imageId = req.file ? req.file.filename : null;
       try {
@@ -57,6 +61,7 @@ const addDonationDB = asyncHandler(async (req, res) => {
           phone,
           pick_up_point,
           restaurant_id,
+          status_id,
         ]);
 
         if (!result || !result.rows || result.rows.length === 0) {
@@ -72,7 +77,6 @@ const addDonationDB = asyncHandler(async (req, res) => {
     });
   });
 });
-
 
 const getDonationById = asyncHandler(async (req, res) => {
   const { donation_id } = req.params;
@@ -98,22 +102,46 @@ const getDonationById = asyncHandler(async (req, res) => {
 });
 
 const getDonations = asyncHandler(async (req, res) => {
+  const { filter, filterId } = req.query;
+
   try {
-    const result = await poolQuery(getDonationsQuery);
+    let query;
+    let queryParams = [];
+
+    switch (filter) {
+      case 'ong':
+        if (!filterId || isNaN(filterId)) {
+          return res.status(400).json({ error: 'Valid Filter ID is required' });
+        }
+        query = getDonationsByOngIdQuery;
+        queryParams.push(parseInt(filterId));
+        break;
+      case 'restaurant':
+        if (!filterId || isNaN(filterId)) {
+          return res.status(400).json({ error: 'Valid Filter ID is required' });
+        }
+        query = getDonationByRestaurantIdQuery;
+        queryParams.push(parseInt(filterId));
+        break;
+      default:
+        query = getDonationsQuery;
+        break;
+    }
+
+    const result = await poolQuery(query, queryParams);
+
     if (!result || !result.rows || result.rows.length === 0) {
       return res.status(404).json('Donations not found');
     }
-    const donationsWithImages = result.rows.map((donation) => {
-      if (donation.image_id) {
-        return {
-          ...donation,
-          imageUrl: `${req.protocol}://${req.get('host')}/uploads/donations/${
+
+    const donationsWithImages = result.rows.map((donation) => ({
+      ...donation,
+      imageUrl: donation.image_id
+        ? `${req.protocol}://${req.get('host')}/uploads/donations/${
             donation.image_id
-          }`,
-        };
-      }
-      return donation;
-    });
+          }`
+        : null,
+    }));
 
     res.json(donationsWithImages);
   } catch (err) {
@@ -152,6 +180,13 @@ const updateDonationById = asyncHandler(async (req, res) => {
       if (!result || !result.rowCount || result.rowCount === 0) {
         return res.status(404).json('Donation not found');
       }
+      const result2 = await poolQuery(updateStatusDonationQuery, [
+        parseInt(donation_id),
+        1,
+      ]);
+      if (!result2 || !result2.rowCount || result2.rowCount === 0) {
+        return res.status(404).json('Donation not found');
+      }
       return res
         .status(200)
         .json(`Donation with ID ${donation_id} has been updated`);
@@ -162,6 +197,13 @@ const updateDonationById = asyncHandler(async (req, res) => {
         delivery_address, // $3
       ]);
       if (!result || !result.rowCount || result.rowCount === 0) {
+        return res.status(404).json('Donation not found');
+      }
+      const result2 = await poolQuery(updateStatusDonationQuery, [
+        parseInt(donation_id),
+        1,
+      ]);
+      if (!result2 || !result2.rowCount || result2.rowCount === 0) {
         return res.status(404).json('Donation not found');
       }
       return res

@@ -13,6 +13,11 @@ CREATE TABLE status_name (
     name VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE donation_status (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE "user" (
     user_id SERIAL PRIMARY KEY,
     user_type_id INTEGER REFERENCES user_type(id),
@@ -62,7 +67,9 @@ CREATE TABLE Donation (
     restaurant_id INTEGER REFERENCES user(user_id) ON DELETE CASCADE,
     ong_id INTEGER REFERENCES user(user_id) ON DELETE SET NULL,
     delivery_address VARCHAR(255),
-    post_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    post_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status_id INTEGER REFERENCES donation_status(id) ON DELETE SET NULL,
+     archived BOOLEAN DEFAULT FALSE,
 );
 
 CREATE TABLE Donation_Driver (

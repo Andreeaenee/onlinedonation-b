@@ -141,10 +141,10 @@ const logIn = asyncHandler(async (req, res) => {
         return res
           .status(400)
           .json('Email verified but registration is not complete');
-      // case 3:
-      //   return res
-      //     .status(400)
-      //     .json("The registration process isn't complete yet");
+      case 3:
+        return res
+          .status(400)
+          .json("The registration process isn't complete yet. Wait for the admin approval");
     }
     const user = result.rows[0];
     const isMatch = bcrypt.compare(password, user.password);
