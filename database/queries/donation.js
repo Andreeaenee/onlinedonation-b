@@ -19,7 +19,6 @@ const deleteDonationByIdQuery = `DELETE FROM donation WHERE donation_id = $1`;
 const updateDonationByIdQuery = `UPDATE donation
     SET ong_id = $2, delivery_address = $3
     WHERE donation_id = $1`;
-
 const updateDonationOnlyOngIdQuery = `UPDATE donation
     SET ong_id = $2
     WHERE donation_id = $1`;
