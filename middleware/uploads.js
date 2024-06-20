@@ -22,8 +22,6 @@ const documentStorage = multer.diskStorage({
       dir = './uploads/cover-photo/';
     } else if (file.fieldname === 'document') {
       dir = './uploads/document/';
-    } else if (file.fieldname === 'contract') {
-      dir = './uploads/contract/';
     }
     createDirectory(dir);
     cb(null, dir);
@@ -85,7 +83,6 @@ const uploadDocumentsMiddleware = uploadDocuments.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'coverPhoto', maxCount: 1 },
   { name: 'document', maxCount: 1 },
-  { name: 'contract', maxCount: 1 },
 ]);
 
 const uploadMiddleware = uploadPhoto.single('image');

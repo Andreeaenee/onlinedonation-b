@@ -79,7 +79,8 @@ const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
 });
 
 const completeRegistration = asyncHandler(async (req, res) => {
-  const { user_id, name, description, address, phone, link, cif } = req.body;
+  const { user_id, name, description, address, phone, link, cif, contractUrl } =
+    req.body;
 
   if (!name || !address || !phone || !cif) {
     return res.status(400).json({ message: 'Please fill all fields' });
@@ -89,7 +90,6 @@ const completeRegistration = asyncHandler(async (req, res) => {
     const logo_id = req.files.logo[0]?.filename || null;
     const cover_photo_id = req.files.coverPhoto[0]?.filename || null;
     const document_id = req.files.document[0]?.filename || null;
-    const contract_id = req.files.contract[0]?.filename || null;
 
     const result = await poolQuery(completeRegistrationQuery, [
       name,
@@ -100,7 +100,7 @@ const completeRegistration = asyncHandler(async (req, res) => {
       cover_photo_id,
       document_id,
       cif,
-      contract_id,
+      contractUrl,
       description,
       user_id,
     ]);
@@ -134,18 +134,7 @@ const logIn = asyncHandler(async (req, res) => {
     }
 
     const { status_id } = result.rows[0];
-    switch (status_id) {
-      case 1:
-        return res.status(400).json('Email not verified');
-      case 2:
-        return res
-          .status(400)
-          .json('Email verified but registration is not complete');
-      case 3:
-        return res
-          .status(400)
-          .json("The registration process isn't complete yet. Wait for the admin approval");
-    }
+    loginErrorHandling(status_id);
     const user = result.rows[0];
     const isMatch = bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -160,27 +149,49 @@ const logIn = asyncHandler(async (req, res) => {
   }
 });
 
+const loginErrorHandling = (status_id) => {
+  switch (status_id) {
+    case 1:
+      return 'Email not verified';
+    case 2:
+      return 'Email verified but registration is not complete';
+    case 3:
+      return `The registration process isn't complete yet. Wait for the admin approval`;
+    default:
+      break;
+  }
+}
+
+
+
 // Log in with Google
 const getAccessTokenFromCode = asyncHandler(async (req, res) => {
   const { code } = req.body;
-  const { data } = await axios({
-    url: `https://oauth2.googleapis.com/token`,
-    method: 'post',
-    data: {
-      client_id: process.env.REST_API_GOOGLE_CLIENT_ID,
-      client_secret: process.env.REST_API_GOOGLE_CLIENT_SECRET,
-      redirect_uri: 'http://localhost:3001/auth/google/callback',
-      grant_type: 'authorization_code',
-      code,
-    },
-  });
-  const userData = await getGoogleUserInfo(data.access_token);
-  const result = await poolQuery(checkUserQuery, [userData.email]);
-  if (!result || !result.rows || result.rows.length === 0) {
-    return res.status(404).json('User not found');
+  try {
+    const { data } = await axios({
+      url: `https://oauth2.googleapis.com/token`,
+      method: 'post',
+      data: {
+        client_id: process.env.REST_API_GOOGLE_CLIENT_ID,
+        client_secret: process.env.REST_API_GOOGLE_CLIENT_SECRET,
+        redirect_uri: 'http://localhost:3001/auth/google/callback',
+        grant_type: 'authorization_code',
+        code,
+      },
+    });
+
+    const userData = await getGoogleUserInfo(data.access_token);
+    const result = await poolQuery(checkUserQuery, [userData.email]);
+    if (!result || !result.rows || result.rows.length === 0) {
+      return res.status(404).json('User not found');
+    }
+
+    const token = generateToken(userData, result.rows[0]);
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error('Error during Google login:', error.message);
+    res.status(302).redirect(`http://localhost:3001/login?error=${encodeURIComponent(error.message)}`);
   }
-  const token = generateToken(userData, result.rows[0]);
-  res.status(200).json({ token });
 });
 
 async function getGoogleUserInfo(access_token) {
@@ -195,21 +206,36 @@ async function getGoogleUserInfo(access_token) {
 
     // Check if the user exists in the database
     const checkUser = await poolQuery(checkUserQuery, [data.email]);
-    if (checkUser.rows.length) {
-      return data;
+    if (!checkUser.rows.length) {
+      throw new Error('User not found');
     }
-    return { message: 'User does not exist in the database' };
+
+    const status_id = checkUser.rows[0]?.status_id;
+    if (status_id === 1) {
+      throw new Error('Email not verified');
+    } else if (status_id === 2) {
+      throw new Error('Email verified but registration is not complete');
+    } else if (status_id === 3) {
+      throw new Error('The registration process isn\'t complete yet. Wait for the admin approval');
+    } else if (status_id === 4) {
+      return { ...data, ...checkUser.rows[0] };
+    } else {
+      throw new Error('Invalid user status');
+    }
   } catch (error) {
     console.error('Error fetching Google user info:', error);
     throw new Error('Error fetching Google user info');
   }
 }
 
+
 function generateToken(user, result) {
   const payload = {
     user_id: result?.user_id || user.user_id,
     email: user.email,
     user_type_id: result?.user_type_id || user.user_type_id,
+    picture: user.picture,
+    status_id: result?.status_id || user.status_id,
   };
   // Sign the token with a secret key
   const token = jwt.sign(payload, privateKey, {

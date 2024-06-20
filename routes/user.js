@@ -6,7 +6,13 @@ const {
   getAccessTokenFromCode,
   completeRegistration,
 } = require('../services/user/userAuth');
-const { addUserDB, getUserEmail, getUsers } = require('../services/user/user');
+const {
+  addUserDB,
+  getUserEmail,
+  getUsers,
+  getUserById,
+  updateStatus,
+} = require('../services/user/user');
 const {
   forgotPassword,
   resetPassword,
@@ -27,6 +33,9 @@ router.post('/login', asyncHandler(getAccessTokenFromCode));
 
 router.get('/users', authMiddleware, asyncHandler(getUsers))
 router.get('/users/login', asyncHandler(logIn));
+router.get('/users/:id', asyncHandler(getUserById));
 router.get('/users/email/:id', asyncHandler(getUserEmail));
+
+router.put('/users/status', authMiddleware, asyncHandler(updateStatus));
 
 module.exports = router;

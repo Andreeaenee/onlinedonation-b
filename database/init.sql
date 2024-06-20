@@ -32,7 +32,7 @@ CREATE TABLE "user" (
     link VARCHAR(255),
     document_id VARCHAR(255),
     cif VARCHAR(255),
-    contract_id VARCHAR(255),
+    contracturl VARCHAR(255),
     description VARCHAR(255)
 );
 

@@ -13,6 +13,8 @@ const {
   getEmailQuery,
   getAllUsersQuery,
   getAllUsersByStatusQuery,
+  getUserByIdQuery,
+  updateUserStatusQuery,
 } = require('../../database/queries/userAuth');
 
 // Add user
@@ -72,14 +74,14 @@ const getUsers = asyncHandler(async (req, res) => {
         }
         const result1 = await poolQuery(getAllUsersByStatusQuery, [filterId]);
         if (!result1 || !result1.rows || result1.rows.length === 0) {
-          return res.status(404).json('Users requests not found');
+          return res.status(200).json('Users requests not found');
         }
         res.status(200).json(result1.rows);
         break;
       default:
         const result = await poolQuery(getAllUsersQuery);
         if (!result || !result.rows || result.rows.length === 0) {
-          return res.status(404).json('Users not found');
+          return res.status(200).json('Users not found');
         }
         res.status(200).json(result.rows);
         break;
@@ -90,6 +92,34 @@ const getUsers = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+
+const getUserById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id || isNaN(id)) {
+    return res.status(400).json({ error: 'User ID must be a valid integer' });
+  }
+  if (!id) {
+    res.status(400);
+    throw new Error('User ID is required');
+  }
+  try {
+    const result = await poolQuery(getUserByIdQuery, [id]);
+    if (!result || !result.rows || result.rows.length === 0) {
+      return res.status(404).json('User not found');
+    }
+    const user = result.rows[0];
+    if (user.logo_id) {
+      user.logoUrl = `${req.protocol}://${req.get(
+        'host'
+      )}/uploads/logo/${user.logo_id}`;
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 
 const getUserEmail = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -109,8 +139,28 @@ const getUserEmail = asyncHandler(async (req, res) => {
   }
 });
 
+const updateStatus = asyncHandler(async (req, res) => {
+  const { id, status_id } = req.body;
+  if (!id || !status_id) {
+    res.status(400);
+    throw new Error('User ID and status ID are required');
+  }
+  try {
+    const result = await poolQuery(updateUserStatusQuery, [id, status_id]);
+    if (!result || !result.rowCount ===0) {
+      return res.status(404).json('Failed to update user status');
+    }
+    res.status(200).json('User status updated');
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   addUserDB,
   getUserEmail,
   getUsers,
+  getUserById,
+  updateStatus,
 };
