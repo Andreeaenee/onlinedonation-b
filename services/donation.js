@@ -131,7 +131,7 @@ const getDonations = asyncHandler(async (req, res) => {
     const result = await poolQuery(query, queryParams);
 
     if (!result || !result.rows || result.rows.length === 0) {
-      return res.status(404).json('Donations not found');
+      return res.status(201).json('Donations not found');
     }
 
     const donationsWithImages = result.rows.map((donation) => ({
