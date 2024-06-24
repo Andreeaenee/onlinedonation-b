@@ -126,7 +126,6 @@ const getUserById = asyncHandler(async (req, res) => {
     if (user.contracturl) {
       // call the contract url
       try {
-        console.log('calling contract url', user.contracturl);
         const response = await axios({
           url: `${user.contracturl}`,
           method: 'get',

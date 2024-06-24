@@ -13,6 +13,9 @@ const getDonationsQuery = `
 const getDonationsByOngIdQuery = ` SELECT donation.*, "user".name AS restaurant_name, donation_status.name AS status_name FROM donation JOIN "user" ON "user".user_id = donation.restaurant_id JOIN donation_status ON donation.status_id = donation_status.id WHERE donation.ong_id = $1 ORDER BY donation.donation_id;`;
 const getDonationByRestaurantIdQuery = ` SELECT donation.*, "user".name AS restaurant_name, donation_status.name AS status_name FROM donation JOIN "user" ON "user".user_id = donation.restaurant_id JOIN donation_status ON donation.status_id = donation_status.id WHERE donation.restaurant_id = $1 ORDER BY donation.donation_id;`;
 const getDonationByIdQuery = `SELECT * FROM donation WHERE donation_id = $1`;
+const getDonationAndDriverByIdQuery = `SELECT donation.*, donation_driver.* FROM donation JOIN donation_driver ON donation.donation_id = donation_driver.donation_id WHERE donation.donation_id = $1`;
+const getDonationStatusQuery = `SELECT * FROM donation_status`;
+const getDonationByStatusQuery = `SELECT donation.*, "user".name AS restaurant_name, donation_status.name AS status_name FROM donation JOIN "user" ON "user".user_id = donation.restaurant_id JOIN donation_status ON donation.status_id = donation_status.id WHERE donation.status_id = $1 ORDER BY donation.donation_id;`;
 
 const deleteDonationByIdQuery = `DELETE FROM donation WHERE donation_id = $1`;
 
@@ -36,4 +39,7 @@ module.exports = {
   updateStatusDonationQuery,
   getDonationsByOngIdQuery,
   getDonationByRestaurantIdQuery,
+  getDonationStatusQuery,
+  getDonationAndDriverByIdQuery,
+  getDonationByStatusQuery,
 };

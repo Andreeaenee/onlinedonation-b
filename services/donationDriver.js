@@ -9,7 +9,6 @@ const poolQuery = promisify(pool.query).bind(pool);
 const addDonationDriverDB = asyncHandler(async (req, res) => {
   const { donation_id } = req.params;
   const { first_name, last_name, contact_number, approx_time } = req.body;
-  console.log("Required body: ", req.body);
   try { 
     const result = await poolQuery(postDonationDriverDataQuery, [
       first_name,

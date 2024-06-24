@@ -15,7 +15,6 @@ const saltRounds = 11;
 //Forgot password
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  console.log('Email', email);
   if (!email) {
     res.status(400);
     throw new Error('Email is required');
@@ -72,7 +71,6 @@ const resetPassword = asyncHandler(async (req, res) => {
     if (!result || !result.rowCount) {
       return res.status(500).json('Failed to update user password');
     }
-    console.log('Password updated successfully');
     res.status(200).json('Password updated successfully');
   } catch (error) {
     res.status(500);
