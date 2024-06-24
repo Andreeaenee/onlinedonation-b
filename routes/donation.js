@@ -6,10 +6,12 @@ const {
   getDonationById,
   getDonations,
   deleteDonationById,
-  updateDonationById,
+  updateDonationByIdOnClaim,
+  updateDonation,
 } = require('../services/donation');
 const { addDonationDriverDB } = require('../services/donationDriver');
 const authMiddleware = require('../middleware/auth');
+const { optionalUpload, optionalImageUpload } = require('../middleware/uploads');
 
 router.post('/donation', authMiddleware, asyncHandler(addDonationDB));
 router.post(
@@ -17,17 +19,25 @@ router.post(
   authMiddleware,
   asyncHandler(addDonationDriverDB)
 );
+
 router.get('/donations', asyncHandler(getDonations));
 router.get('/donations/:donation_id', asyncHandler(getDonationById));
+
 router.delete(
   '/donations/:donation_id',
   authMiddleware,
   asyncHandler(deleteDonationById)
 );
+
+router.put(
+  '/donations/claim/:donation_id',
+  authMiddleware,
+  asyncHandler(updateDonationByIdOnClaim)
+);
 router.put(
   '/donations/:donation_id',
   authMiddleware,
-  asyncHandler(updateDonationById)
+  optionalImageUpload,
+  asyncHandler(updateDonation)
 );
-
 module.exports = router;

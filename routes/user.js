@@ -12,12 +12,16 @@ const {
   getUsers,
   getUserById,
   updateStatus,
+  updateUser,
 } = require('../services/user/user');
 const {
   forgotPassword,
   resetPassword,
 } = require('../services/user/forgetPass');
-const { uploadDocumentsMiddleware } = require('../middleware/uploads');
+const {
+  uploadDocumentsMiddleware,
+  optionalLogoUpload,
+} = require('../middleware/uploads');
 const authMiddleware = require('../middleware/auth');
 
 router.post('/users/credentials', asyncHandler(addUserDB));
@@ -30,12 +34,17 @@ router.post(
 );
 router.post('/login', asyncHandler(getAccessTokenFromCode));
 
-
-router.get('/users', authMiddleware, asyncHandler(getUsers))
+router.get('/users', authMiddleware, asyncHandler(getUsers));
 router.get('/users/login', asyncHandler(logIn));
 router.get('/users/:id', asyncHandler(getUserById));
 router.get('/users/email/:id', asyncHandler(getUserEmail));
 
 router.put('/users/status', authMiddleware, asyncHandler(updateStatus));
+router.put(
+  '/users/:id',
+  authMiddleware,
+  optionalLogoUpload,
+  asyncHandler(updateUser)
+);
 
 module.exports = router;

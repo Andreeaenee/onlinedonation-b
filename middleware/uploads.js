@@ -35,7 +35,12 @@ const documentStorage = multer.diskStorage({
 // Configure multer for single photo storage
 const photoStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const dir = './uploads/donations/';
+    let dir = './uploads/others/';
+    if (file.fieldname === 'image') {
+      dir = './uploads/donations/';
+    } else if (file.fieldname === 'logo_id') {
+      dir = './uploads/logo/';
+    }
     createDirectory(dir);
     cb(null, dir);
   },
@@ -46,11 +51,15 @@ const photoStorage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === 'logo' || file.fieldname === 'coverPhoto') {
+  if (
+    file.fieldname === 'logo' ||
+    file.fieldname === 'coverPhoto' ||
+    file.fieldname === 'logo_id'
+  ) {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
       return cb(new Error('Only image files are allowed!'), false);
     }
-  } else if (file.fieldname === 'document' || file.fieldname === 'contract') {
+  } else if (file.fieldname === 'document') {
     if (!file.originalname.match(/\.(pdf)$/)) {
       return cb(new Error('Only PDF files are allowed!'), false);
     }
@@ -84,8 +93,40 @@ const uploadDocumentsMiddleware = uploadDocuments.fields([
   { name: 'coverPhoto', maxCount: 1 },
   { name: 'document', maxCount: 1 },
 ]);
-
 const uploadMiddleware = uploadPhoto.single('image');
+const uploadLogoMiddleware = uploadPhoto.single('logo_id');
+
+const optionalLogoUpload = (req, res, next) => {
+  if (
+    req.method === 'PUT' &&
+    req.headers['content-type'].startsWith('multipart/form-data')
+  ) {
+    uploadLogoMiddleware(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+};
+
+const optionalImageUpload = (req, res, next) => {
+  if (
+    req.method === 'PUT' &&
+    req.headers['content-type'].startsWith('multipart/form-data')
+  ) {
+    uploadMiddleware(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+};
 
 const handleFileSizeLimit = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
@@ -100,4 +141,7 @@ module.exports = {
   handleFileSizeLimit,
   uploadMiddleware,
   uploadDocumentsMiddleware,
+  uploadLogoMiddleware,
+  optionalLogoUpload,
+  optionalImageUpload,
 };

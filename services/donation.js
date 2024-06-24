@@ -168,7 +168,7 @@ const deleteDonationById = asyncHandler(async (req, res) => {
   }
 });
 
-const updateDonationById = asyncHandler(async (req, res) => {
+const updateDonationByIdOnClaim = asyncHandler(async (req, res) => {
   const { donation_id } = req.params;
   const { ong_id, delivery_address } = req.body;
   try {
@@ -216,10 +216,99 @@ const updateDonationById = asyncHandler(async (req, res) => {
   }
 });
 
+const updateDonation = asyncHandler(async (req, res) => {
+  const { donation_id } = req.params;
+  const {
+    name,
+    description,
+    quantity,
+    start_date,
+    end_date,
+    transport_provided,
+    phone,
+    pick_up_point,
+    restaurant_id,
+  } = req.body;
+
+  if (!donation_id) {
+    res.status(400);
+    throw new Error('Donation ID is required');
+  }
+
+  try {
+    const image = req.file ? req.file.filename : null;
+
+    const updateFields = [];
+    const updateParams = [];
+    let paramIndex = 1;
+
+    if (name) {
+      updateFields.push(`name = $${paramIndex++}`);
+      updateParams.push(name);
+    }
+    if (description) {
+      updateFields.push(`description = $${paramIndex++}`);
+      updateParams.push(description);
+    }
+    if (quantity) {
+      updateFields.push(`quantity = $${paramIndex++}`);
+      updateParams.push(quantity);
+    }
+    if (image) {
+      updateFields.push(`image_id = $${paramIndex++}`);
+      updateParams.push(image);
+    }
+    if (start_date) {
+      updateFields.push(`start_date = $${paramIndex++}`);
+      updateParams.push(start_date);
+    }
+    if (end_date) {
+      updateFields.push(`end_date = $${paramIndex++}`);
+      updateParams.push(end_date);
+    }
+    if (transport_provided) {
+      updateFields.push(`transport_provided = $${paramIndex++}`);
+      updateParams.push(transport_provided);
+    }
+    if (phone) {
+      updateFields.push(`phone = $${paramIndex++}`);
+      updateParams.push(phone);
+    }
+    if (pick_up_point) {
+      updateFields.push(`pick_up_point = $${paramIndex++}`);
+      updateParams.push(pick_up_point);
+    }
+    if (restaurant_id) {
+      updateFields.push(`restaurant_id = $${paramIndex++}`);
+      updateParams.push(restaurant_id);
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    const updateQuery = `UPDATE donation SET ${updateFields.join(', ')} WHERE donation_id = $${paramIndex}`;
+    updateParams.push(donation_id);
+
+    const result = await poolQuery(updateQuery, updateParams);
+
+    if (!result || !result.rowCount) {
+      return res.status(500).json('Failed to update donation');
+    }
+
+    res.status(200).json('Donation updated');
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+
 module.exports = {
   addDonationDB,
   getDonationById,
   getDonations,
   deleteDonationById,
-  updateDonationById,
+  updateDonationByIdOnClaim,
+  updateDonation,
 };

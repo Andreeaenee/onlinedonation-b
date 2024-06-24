@@ -79,7 +79,7 @@ const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
 });
 
 const completeRegistration = asyncHandler(async (req, res) => {
-  const { user_id, name, description, address, phone, link, cif, contractUrl } =
+  const { user_id, name, description, address, phone, link, cif, contract } =
     req.body;
 
   if (!name || !address || !phone || !cif) {
@@ -100,7 +100,7 @@ const completeRegistration = asyncHandler(async (req, res) => {
       cover_photo_id,
       document_id,
       cif,
-      contractUrl,
+      contract,
       description,
       user_id,
     ]);
