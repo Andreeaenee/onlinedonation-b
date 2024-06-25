@@ -16,7 +16,9 @@ const {
   getAllUsersByStatusQuery,
   getUserByIdQuery,
   updateUserStatusQuery,
+  getUsersWithCurrentDonationsQuery,
 } = require('../../database/queries/userAuth');
+const { formatDate } = require('../../utils/date');
 
 // Add user
 const addUserDB = asyncHandler(async (req, res) => {
@@ -243,12 +245,44 @@ const updateUser = asyncHandler(async (req, res) => {
 
     res.status(200).json('User updated');
   } catch (error) {
-    console.error(error.message); 
+    console.error(error.message);
     res.status(500);
     throw new Error(error.message);
   }
 });
 
+const getUsersWithCurrentDonations = asyncHandler(async (req, res) => {
+  const date = new Date();
+  const formattedDate = formatDate(date);
+  if (!formattedDate) {
+    res.status(400);
+    throw new Error('Date is required');
+  }
+  try {
+    const result = await poolQuery(getUsersWithCurrentDonationsQuery, [
+      formattedDate,
+    ]);
+    if (!result || !result.rows || result.rows.length === 0) {
+      return res.status(201).json('Users not found');
+    }
+    const usersWithImages = result.rows.map((user) => ({
+      ...user,
+      logoUrl: user.logo_id
+        ? `${req.protocol}://${req.get('host')}/uploads/logo/${user.logo_id}`
+        : null,
+      coverPhotoUrl: user.main_photo_id
+        ? `${req.protocol}://${req.get('host')}/uploads/cover-photo/${
+            user.main_photo_id
+          }`
+        : null,
+    }));
+
+    res.status(200).json(usersWithImages);
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
 
 module.exports = {
   addUserDB,
@@ -257,4 +291,5 @@ module.exports = {
   getUserById,
   updateStatus,
   updateUser,
+  getUsersWithCurrentDonations,
 };

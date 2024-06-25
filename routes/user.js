@@ -13,6 +13,7 @@ const {
   getUserById,
   updateStatus,
   updateUser,
+  getUsersWithCurrentDonations,
 } = require('../services/user/user');
 const {
   forgotPassword,
@@ -36,6 +37,7 @@ router.post('/login', asyncHandler(getAccessTokenFromCode));
 
 router.get('/users', authMiddleware, asyncHandler(getUsers));
 router.get('/users/login', asyncHandler(logIn));
+router.get('/users/today', asyncHandler(getUsersWithCurrentDonations));
 router.get('/users/:id', asyncHandler(getUserById));
 router.get('/users/email/:id', asyncHandler(getUserEmail));
 

@@ -21,6 +21,13 @@ const getUserByIdQuery = `
   WHERE 
     u.user_id = $1;
 `;
+const getUsersWithCurrentDonationsQuery = `SELECT *
+FROM "user"
+WHERE user_id IN (
+    SELECT DISTINCT restaurant_id
+    FROM "donation"
+    WHERE DATE(post_date) = $1
+);`;
 
 const addVerificationEmailTokenQuery = `INSERT INTO "email_verification" (user_id, confirmation_token) VALUES ($1, $2) returning user_id;`;
 const getUserIdQuery = `SELECT user_id, created_at FROM email_verification WHERE confirmation_token = $1;`;
@@ -46,4 +53,5 @@ module.exports = {
   getUserTypeQuery,
   getAllUsersByStatusQuery,
   getUserByIdQuery,
+  getUsersWithCurrentDonationsQuery,
 };
