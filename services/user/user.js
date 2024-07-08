@@ -5,7 +5,11 @@ const asyncHandler = require('express-async-handler');
 const { promisify } = require('util');
 const pool = require('../../config/db');
 const poolQuery = promisify(pool.query).bind(pool);
-const { sendVerificationEmail } = require('../../utils/email');
+const {
+  sendVerificationEmail,
+  sendAccountAcceptedEmail,
+  sendAccountRejectionEmail,
+} = require('../../utils/email');
 const axios = require('axios');
 const {
   addUserQuery,
@@ -175,6 +179,12 @@ const updateStatus = asyncHandler(async (req, res) => {
     const result = await poolQuery(updateUserStatusQuery, [id, status_id]);
     if (!result || !result.rowCount === 0) {
       return res.status(404).json('Failed to update user status');
+    }
+    const email = result.rows[0].email;
+    if (status_id === 4) {
+      sendAccountAcceptedEmail(email);
+    } else if (status_id === 5) {
+      sendAccountRejectionEmail(email);
     }
     res.status(200).json('User status updated');
   } catch (error) {

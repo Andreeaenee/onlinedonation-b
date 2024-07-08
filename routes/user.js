@@ -24,6 +24,7 @@ const {
   optionalLogoUpload,
 } = require('../middleware/uploads');
 const authMiddleware = require('../middleware/auth');
+const { getDonationStatusChartData } = require('../services/charts');
 
 router.post('/users/credentials', asyncHandler(addUserDB));
 router.post('/users/forgot-password', asyncHandler(forgotPassword));
@@ -40,6 +41,7 @@ router.get('/users/login', asyncHandler(logIn));
 router.get('/users/today', asyncHandler(getUsersWithCurrentDonations));
 router.get('/users/:id', asyncHandler(getUserById));
 router.get('/users/email/:id', asyncHandler(getUserEmail));
+router.get('/users/status/:id', asyncHandler(getDonationStatusChartData));
 
 router.put('/users/status', authMiddleware, asyncHandler(updateStatus));
 router.put(

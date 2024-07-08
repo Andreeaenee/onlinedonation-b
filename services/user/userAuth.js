@@ -133,15 +133,20 @@ const logIn = asyncHandler(async (req, res) => {
       return res.status(404).json('User not found');
     }
 
-    const { status_id } = result.rows[0];
-    loginErrorHandling(status_id);
     const user = result.rows[0];
-    const isMatch = bcrypt.compare(password, user.password);
+    const { status_id } = user;
+
+    const loginError = loginErrorHandling(status_id);
+    if (loginError) {
+      return res.status(400).json(loginError);
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json('Invalid credentials');
     }
-    const token = generateToken(user);
 
+    const token = generateToken(user);
     res.status(200).json({ token });
   } catch (error) {
     res.status(500);
@@ -156,12 +161,11 @@ const loginErrorHandling = (status_id) => {
     case 2:
       return 'Email verified but registration is not complete';
     case 3:
-      return `The registration process isn't complete yet. Wait for the admin approval`;
+      return 'The registration process isn\'t complete yet. Wait for the admin approval';
     default:
-      break;
+      return null;
   }
 }
-
 
 
 // Log in with Google
