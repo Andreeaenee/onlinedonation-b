@@ -15,9 +15,9 @@ const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const privateKey = fs.readFileSync(
-  path.join(__dirname, '../../utilsPasswords/private_key.pem')
-);
+require('dotenv').config();
+const privateKey = process.env.REST_API_PRIVATE_KEY;
+console.log('privateKey:', privateKey);
 
 // Verify email
 const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
@@ -161,12 +161,11 @@ const loginErrorHandling = (status_id) => {
     case 2:
       return 'Email verified but registration is not complete';
     case 3:
-      return 'The registration process isn\'t complete yet. Wait for the admin approval';
+      return "The registration process isn't complete yet. Wait for the admin approval";
     default:
       return null;
   }
-}
-
+};
 
 // Log in with Google
 const getAccessTokenFromCode = asyncHandler(async (req, res) => {
@@ -194,7 +193,13 @@ const getAccessTokenFromCode = asyncHandler(async (req, res) => {
     res.status(200).json({ token });
   } catch (error) {
     console.error('Error during Google login:', error.message);
-    res.status(302).redirect(`${process.env.REST_API_FE}/login?error=${encodeURIComponent(error.message)}`);
+    res
+      .status(302)
+      .redirect(
+        `${process.env.REST_API_FE}/login?error=${encodeURIComponent(
+          error.message
+        )}`
+      );
   }
 });
 
@@ -220,7 +225,9 @@ async function getGoogleUserInfo(access_token) {
     } else if (status_id === 2) {
       throw new Error('Email verified but registration is not complete');
     } else if (status_id === 3) {
-      throw new Error('The registration process isn\'t complete yet. Wait for the admin approval');
+      throw new Error(
+        "The registration process isn't complete yet. Wait for the admin approval"
+      );
     } else if (status_id === 4) {
       return { ...data, ...checkUser.rows[0] };
     } else {
@@ -231,7 +238,6 @@ async function getGoogleUserInfo(access_token) {
     throw new Error('Error fetching Google user info');
   }
 }
-
 
 function generateToken(user, result) {
   const payload = {

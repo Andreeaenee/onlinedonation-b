@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Load the public key for verifying JWT tokens
-const publicKey = fs.readFileSync(path.join(__dirname, '../utilsPasswords/public_key.pem'));
+const publicKey = process.env.REST_API_PUBLIC_KEY;
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
