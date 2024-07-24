@@ -17,7 +17,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const privateKey = process.env.REST_API_PRIVATE_KEY;
-console.log('privateKey:', privateKey);
 
 // Verify email
 const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
