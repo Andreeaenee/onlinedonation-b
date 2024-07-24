@@ -29,6 +29,9 @@ WHERE user_id IN (
     WHERE DATE(post_date) = $1
 );`;
 
+const deleteEmailVerificationQuery = 'DELETE FROM email_verification WHERE user_id = $1';
+const deleteUserQuery = 'DELETE FROM "user" WHERE user_id = $1';
+
 const addVerificationEmailTokenQuery = `INSERT INTO "email_verification" (user_id, confirmation_token) VALUES ($1, $2) returning user_id;`;
 const getUserIdQuery = `SELECT user_id, created_at FROM email_verification WHERE confirmation_token = $1;`;
 const updateUserStatusQuery = `UPDATE "user" SET status_id = $2 WHERE user_id = $1 RETURNING email;`;
@@ -54,4 +57,6 @@ module.exports = {
   getAllUsersByStatusQuery,
   getUserByIdQuery,
   getUsersWithCurrentDonationsQuery,
+  deleteUserQuery,
+  deleteEmailVerificationQuery,
 };

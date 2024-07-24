@@ -14,6 +14,7 @@ const {
   updateStatus,
   updateUser,
   getUsersWithCurrentDonations,
+  deleteUser,
 } = require('../services/user/user');
 const {
   forgotPassword,
@@ -50,5 +51,7 @@ router.put(
   optionalLogoUpload,
   asyncHandler(updateUser)
 );
+
+router.delete('/users/:id', authMiddleware, asyncHandler(deleteUser));
 
 module.exports = router;

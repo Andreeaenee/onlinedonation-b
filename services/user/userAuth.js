@@ -178,7 +178,7 @@ const getAccessTokenFromCode = asyncHandler(async (req, res) => {
       data: {
         client_id: process.env.REST_API_GOOGLE_CLIENT_ID,
         client_secret: process.env.REST_API_GOOGLE_CLIENT_SECRET,
-        redirect_uri: 'http://localhost:3001/auth/google/callback',
+        redirect_uri: process.env.REST_API_GOOGLE_REDIRECT_URI,
         grant_type: 'authorization_code',
         code,
       },
@@ -194,7 +194,7 @@ const getAccessTokenFromCode = asyncHandler(async (req, res) => {
     res.status(200).json({ token });
   } catch (error) {
     console.error('Error during Google login:', error.message);
-    res.status(302).redirect(`http://localhost:3001/login?error=${encodeURIComponent(error.message)}`);
+    res.status(302).redirect(`${process.env.REST_API_FE}/login?error=${encodeURIComponent(error.message)}`);
   }
 });
 

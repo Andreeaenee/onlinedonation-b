@@ -28,7 +28,7 @@ const sendVerificationEmail = (email, verificationToken) => {
     },
     to: email,
     subject: 'HopeShare Email Verification',
-    text: `Please click the link below to verify your email: http://localhost:3000/verify-email/${verificationToken}`,
+    text: `Please click the link below to verify your email: ${process.env.REST_API_BE}/verify-email/${verificationToken}`,
   };
   sendMail(transporter, mailOptions);
 };
@@ -42,7 +42,7 @@ const sendPasswordResetEmail = (email, verificationToken) => {
     },
     to: email,
     subject: 'HopeShare Reset Password',
-    text: `Please click the link below to reset your password: http://localhost:3000/forget-password/${verificationToken}`,
+    text: `Please click the link below to reset your password: ${process.env.REST_API_BE}/forget-password/${verificationToken}`,
   };
   sendMail(transporter, mailOptions);
 };

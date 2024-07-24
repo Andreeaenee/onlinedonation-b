@@ -21,6 +21,8 @@ const {
   getUserByIdQuery,
   updateUserStatusQuery,
   getUsersWithCurrentDonationsQuery,
+  deleteUserQuery,
+  deleteEmailVerificationQuery,
 } = require('../../database/queries/userAuth');
 const { formatDate } = require('../../utils/date');
 
@@ -294,6 +296,28 @@ const getUsersWithCurrentDonations = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    res.status(400);
+    throw new Error('User ID is required');
+  }
+  try {
+    const result1 = await poolQuery(deleteEmailVerificationQuery, [id]);
+    if (!result1 || !result1.rowCount) {
+      return res.status(404).json('Failed to delete email verifiation user');
+    }
+    const result = await poolQuery(deleteUserQuery, [id]);
+    if (!result || !result.rowCount) {
+      return res.status(404).json('Failed to delete user');
+    }
+    res.status(200).json('User deleted');
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   addUserDB,
   getUserEmail,
@@ -302,4 +326,5 @@ module.exports = {
   updateStatus,
   updateUser,
   getUsersWithCurrentDonations,
+  deleteUser,
 };
