@@ -38,16 +38,16 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/hopeshar
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-            echo "REST_API_BE=${{ secrets.REST_API_BE }}" >> .env
-            echo "REST_API_FE=${{ secrets.REST_API_FE }}" >> .env
-            echo "REST_API_GOOGLE_CLIENT_ID=${{ secrets.REST_API_GOOGLE_CLIENT_ID }}" >> .env
-            echo "REST_API_GOOGLE_CLIENT_SECRET=${{ secrets.REST_API_GOOGLE_CLIENT_SECRET }}" >> .env
-            echo "REST_API_GOOGLE_REDIRECT_URI=${{ secrets.REST_API_GOOGLE_REDIRECT_URI }}" >> .env
-            echo "REST_API_USER_EMAIL=${{ secrets.REST_API_USER_EMAIL }}" >> .env
-            echo "REST_API_USER_PASSWORD=${{ secrets.REST_API_USER_PASSWORD }}" >> .env
-            echo "REST_API_UVTSIGN_TOKEN=${{ secrets.REST_API_UVTSIGN_TOKEN }}" >> .env
-            echo "REST_API_PRIVATE_KEY=${{ secrets.REST_API_PRIVATE_KEY }}" >> .env
-            echo "REST_API_PUBLIC_KEY=${{ secrets.REST_API_PUBLIC_KEY }}" >> .env
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+            echo "REST_API_BE=\"${{ secrets.REST_API_BE }}\"" >> .env
+            echo "REST_API_FE=\"${{ secrets.REST_API_FE }}\"" >> .env
+            echo "REST_API_GOOGLE_CLIENT_ID=\"${{ secrets.REST_API_GOOGLE_CLIENT_ID }}\"" >> .env
+            echo "REST_API_GOOGLE_CLIENT_SECRET=\"${{ secrets.REST_API_GOOGLE_CLIENT_SECRET }}\"" >> .env
+            echo "REST_API_GOOGLE_REDIRECT_URI=\"${{ secrets.REST_API_GOOGLE_REDIRECT_URI }}\"" >> .env
+            echo "REST_API_USER_EMAIL=\"${{ secrets.REST_API_USER_EMAIL }}\"" >> .env
+            echo "REST_API_USER_PASSWORD=\"${{ secrets.REST_API_USER_PASSWORD }}\"" >> .env
+            echo "REST_API_UVTSIGN_TOKEN=\"${{ secrets.REST_API_UVTSIGN_TOKEN }}\"" >> .env
+            echo "REST_API_PRIVATE_KEY=\"${{ secrets.REST_API_PRIVATE_KEY }}\"" >> .env
+            echo "REST_API_PUBLIC_KEY=\"${{ secrets.REST_API_PUBLIC_KEY }}\"" >> .env
             docker-compose pull
             docker-compose up -d
