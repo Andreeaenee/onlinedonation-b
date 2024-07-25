@@ -4,11 +4,14 @@ FROM node:22.1.0
 # Set the working directory
 WORKDIR /app
 
-COPY . .   
+# Copy the package.json and package-lock.json
+COPY package*.json ./
 
 RUN npm install
 
 RUN npm rebuild bcrypt  
+
+COPY . .
 
 # Expose the port the app runs on
 EXPOSE 3000
