@@ -1,22 +1,26 @@
-# Use the official Node.js image from the Docker Hub
-FROM node:22-alpine
+# Use the official Node.js 22.5.1 image as a base image
+FROM node:22.5.1
 
-# Create and change to the app directory
+# Set the working directory
 WORKDIR /app
 
-# Install app dependencies
-COPY package.json ./
-COPY package-lock.json ./
+# Install build tools
+RUN apk add --no-cache python3 make g++
+
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm install
 
-# Rebuild bcrypt to match the Docker environment
-RUN npm rebuild bcrypt
-
-# Copy the rest of your application code
+# Copy the rest of the application code
 COPY . .
+
+# Rebuild native modules to ensure compatibility
+RUN npm rebuild bcrypt
 
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Command to run the app
+# Start the application
 CMD ["npm", "start"]
