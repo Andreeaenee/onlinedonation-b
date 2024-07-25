@@ -5,15 +5,16 @@ FROM node:22.1.0
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-RUN npm rebuild bcrypt
-
 # Copy the rest of the application code
 COPY . .
+
+# Rebuild native modules to ensure compatibility
+RUN npm rebuild bcrypt
 
 # Expose the port the app runs on
 EXPOSE 3000
