@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
@@ -24,7 +25,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t andreeaene/hopeshare-backend:${{ github.sha }} ./backend
+          docker build -t andreeaene/hopeshare-backend:${{ github.sha }} .
           docker tag andreeaene/hopeshare-backend:${{ github.sha }} andreeaene/hopeshare-backend:latest
           docker push andreeaene/hopeshare-backend:${{ github.sha }}
           docker push andreeaene/hopeshare-backend:latest
@@ -37,14 +38,18 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/hopeshar
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
-            echo "REST_API_BE=${{ secrets.REST_API_BE }}" >> .env
-            echo "REST_API_FE=${{ secrets.REST_API_FE }}" >> .env
-            echo "REST_API_GOOGLE_CLIENT_ID=${{ secrets.REST_API_GOOGLE_CLIENT_ID }}" >> .env
-            echo "REST_API_GOOGLE_CLIENT_SECRET=${{ secrets.REST_API_GOOGLE_CLIENT_SECRET }}" >> .env
-            echo "REST_API_GOOGLE_REDIRECT_URI=${{ secrets.REST_API_GOOGLE_REDIRECT_URI }}" >> .env
-            echo "REST_API_USER_EMAIL=${{ secrets.REST_API_USER_EMAIL }}" >> .env
-            echo "REST_API_USER_PASSWORD=${{ secrets.REST_API_USER_PASSWORD }}" >> .env
-            echo "REST_API_UVTSIGN_TOKEN=${{ secrets.REST_API_UVTSIGN_TOKEN }}" >> .env
+            rm -rf .env.backend
+            touch .env.backend
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env.backend
+            echo "REST_API_BE=\"${{ secrets.REST_API_BE }}\"" >> .env.backend
+            echo "REST_API_FE=\"${{ secrets.REST_API_FE }}\"" >> .env.backend
+            echo "REST_API_GOOGLE_CLIENT_ID=\"${{ secrets.REST_API_GOOGLE_CLIENT_ID }}\"" >> .env.backend
+            echo "REST_API_GOOGLE_CLIENT_SECRET=\"${{ secrets.REST_API_GOOGLE_CLIENT_SECRET }}\"" >> .env.backend
+            echo "REST_API_GOOGLE_REDIRECT_URI=\"${{ secrets.REST_API_GOOGLE_REDIRECT_URI }}\"" >> .env.backend
+            echo "REST_API_USER_EMAIL=\"${{ secrets.REST_API_USER_EMAIL }}\"" >> .env.backend
+            echo "REST_API_USER_PASSWORD=\"${{ secrets.REST_API_USER_PASSWORD }}\"" >> .env.backend
+            echo "REST_API_UVTSIGN_TOKEN=\"${{ secrets.REST_API_UVTSIGN_TOKEN }}\"" >> .env.backend
+            echo "REST_API_PRIVATE_KEY=\"${{ secrets.REST_API_PRIVATE_KEY }}\"" >> .env.backend
+            echo "REST_API_PUBLIC_KEY=\"${{ secrets.REST_API_PUBLIC_KEY }}\"" >> .env.backend
             docker-compose pull
             docker-compose up -d
