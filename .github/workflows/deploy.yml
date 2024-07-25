@@ -38,6 +38,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/hopeshar
+            rm -rf .env.backend
+            touch .env.backend
             echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env.backend
             echo "REST_API_BE=\"${{ secrets.REST_API_BE }}\"" >> .env.backend
             echo "REST_API_FE=\"${{ secrets.REST_API_FE }}\"" >> .env.backend
