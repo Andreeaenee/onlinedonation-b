@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(compression());
 app.use("/api", donationRouter);
 app.use("/api", userRouter);
-app.use("/", commonRouter);
-app.use("/uploads", express.static("uploads"));
+app.use("/api", commonRouter);
+app.use("/api/uploads", express.static("uploads"));
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
