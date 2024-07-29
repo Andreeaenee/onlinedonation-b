@@ -117,19 +117,19 @@ const getUserById = asyncHandler(async (req, res) => {
     }
     const user = result.rows[0];
     if (user.logo_id) {
-      user.logoUrl = `${req.protocol}://${req.get('host')}/uploads/logo/${
+      user.logoUrl = `${req.protocol}://${req.get('host')}/api/uploads/logo/${
         user.logo_id
       }`;
     }
     if (user.document_id) {
       user.documentUrl = `${req.protocol}://${req.get(
         'host'
-      )}/uploads/document/${user.document_id}`;
+      )}/api/uploads/document/${user.document_id}`;
     }
     if (user.main_photo_id) {
       user.mainPhotoUrl = `${req.protocol}://${req.get(
         'host'
-      )}/uploads/cover-photo/${user.main_photo_id}`;
+      )}/api/uploads/cover-photo/${user.main_photo_id}`;
     }
     if (user.contracturl) {
       // call the contract url
@@ -280,10 +280,10 @@ const getUsersWithCurrentDonations = asyncHandler(async (req, res) => {
     const usersWithImages = result.rows.map((user) => ({
       ...user,
       logoUrl: user.logo_id
-        ? `${req.protocol}://${req.get('host')}/uploads/logo/${user.logo_id}`
+        ? `${req.protocol}://${req.get('host')}/api/uploads/logo/${user.logo_id}`
         : null,
       coverPhotoUrl: user.main_photo_id
-        ? `${req.protocol}://${req.get('host')}/uploads/cover-photo/${
+        ? `${req.protocol}://${req.get('host')}/api/uploads/cover-photo/${
             user.main_photo_id
           }`
         : null,

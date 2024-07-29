@@ -101,7 +101,7 @@ const getDonationById = asyncHandler(async (req, res) => {
     if (donation.image_id) {
       donation.imageUrl = `${req.protocol}://${req.get(
         'host'
-      )}/uploads/donations/${donation.image_id}`;
+      )}/api/uploads/donations/${donation.image_id}`;
     }
     res.json(donation);
   } catch (err) {
@@ -153,7 +153,7 @@ const getDonations = asyncHandler(async (req, res) => {
     const donationsWithImages = result.rows.map((donation) => ({
       ...donation,
       imageUrl: donation.image_id
-        ? `${req.protocol}://${req.get('host')}/uploads/donations/${
+        ? `${req.protocol}://${req.get('host')}/api/uploads/donations/${
             donation.image_id
           }`
         : null,
