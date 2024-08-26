@@ -53,7 +53,7 @@ CREATE TABLE users_have_socials (
 );
 
 
-CREATE TABLE Donation (
+CREATE TABLE donation (
     donation_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
@@ -64,12 +64,12 @@ CREATE TABLE Donation (
     transport_provided BOOLEAN,
     phone VARCHAR(20),
     pick_up_point VARCHAR(255),
-    restaurant_id INTEGER REFERENCES user(user_id) ON DELETE CASCADE,
-    ong_id INTEGER REFERENCES user(user_id) ON DELETE SET NULL,
+    restaurant_id INTEGER REFERENCES "user"(user_id) ON DELETE CASCADE,
+    ong_id INTEGER REFERENCES "user"(user_id) ON DELETE SET NULL,
     delivery_address VARCHAR(255),
     post_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status_id INTEGER REFERENCES donation_status(id) ON DELETE SET NULL,
-     archived BOOLEAN DEFAULT FALSE,
+    archived BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE Donation_Driver (

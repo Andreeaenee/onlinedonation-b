@@ -16,7 +16,7 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
-const privateKey = process.env.REST_API_PRIVATE_KEY;
+const privateKey = process.env.REST_API_PRIVATE_KEY.replace(/\\n/g, '\n');
 
 // Verify email
 const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
@@ -140,7 +140,7 @@ const logIn = asyncHandler(async (req, res) => {
       return res.status(400).json(loginError);
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json('Invalid credentials');
     }
