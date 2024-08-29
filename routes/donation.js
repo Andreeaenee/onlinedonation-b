@@ -14,6 +14,7 @@ const {
 const { addDonationDriverDB } = require('../services/donationDriver');
 const authMiddleware = require('../middleware/auth');
 const { optionalImageUpload } = require('../middleware/uploads');
+const { getDonationsAvailableCount } = require('../services/charts');
 
 router.post('/donation', authMiddleware, asyncHandler(addDonationDB));
 router.post(
@@ -24,6 +25,7 @@ router.post(
 
 router.get('/donations', asyncHandler(getDonations));
 router.get('/donations/status', asyncHandler(getDonationStatus));
+router.get('/donations/chartCount', asyncHandler(getDonationsAvailableCount));
 router.get('/donations/:donation_id', asyncHandler(getDonationById));
 
 router.delete(
