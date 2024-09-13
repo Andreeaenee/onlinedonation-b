@@ -25,6 +25,7 @@ const verifyEmail = asyncHandler(async (req, res, isPasswordReset) => {
     res.status(400);
     throw new Error('Token is required');
   }
+  console.log('Aici');
   try {
     // Get user_id from email_verification table
     const result = await poolQuery(getUserIdQuery, [token]);

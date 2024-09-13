@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(compression());
 app.use("/api", donationRouter);
 app.use("/api", userRouter);
-app.use("/api", commonRouter);
+app.use("/", commonRouter);
 app.use("/api/uploads", express.static("uploads"));
 
 app.listen(port, () => {
